@@ -19,8 +19,9 @@ and open the template in the editor.
             #divData{
                 border-style: solid;
                 border-width: 1px;
-                min-width: 80%;
-                margin: auto;
+                min-width: 0px;
+                min-height: 20vh;
+                /*margin: auto;*/
                 text-align: center;
             }
         </style>
@@ -28,7 +29,7 @@ and open the template in the editor.
     <body>
         <div id="divAudio">
             <audio id="audioSrc" controls="" >
-                <source src="music/05 Delay Order.mp3">
+                <source src="music/09_comouflage.mp3">
             </audio>
         </div>
         <div id="divData"></div>
@@ -38,22 +39,23 @@ and open the template in the editor.
                 console.log(value);
             }
             var divData = document.getElementById("divData");
+            divData.style.backgroundColor = 'green';
             var audio = document.getElementById("audioSrc");
             var audioCtx = new AudioContext();
             var analyser = audioCtx.createAnalyser();
             var source = audioCtx.createMediaElementSource(audio);
             source.connect(analyser);
             analyser.connect(audioCtx.destination);
-            analyser.fftSize = 2048;
+            analyser.fftSize = 32;
             
             var freqData = new Uint8Array(analyser.frequencyBinCount);
             var floatFreqData = new Float32Array(analyser.frequencyBinCount);
-            document.onclick = function(){
+            setInterval(function(){
                 analyser.getByteFrequencyData(freqData);
                 analyser.getFloatFrequencyData(floatFreqData);
-                divData.innerHTML = freqData + "<br/>" +
-                                    floatFreqData;
-            };
+                
+                divData.style.width = freqData[8]+"px" || 0;
+            }, 50);
         </script>
     </body>
 </html>
