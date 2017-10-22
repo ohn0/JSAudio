@@ -29,7 +29,7 @@ and open the template in the editor.
     <body>
         <div id="divAudio">
             <audio id="audioSrc" controls="" >
-                <source src="music/09_comouflage.mp3">
+                <source src="music/05 Delay Order.mp3">
             </audio>
         </div>
         <div id="divData"></div>
@@ -54,7 +54,8 @@ and open the template in the editor.
                 analyser.getByteFrequencyData(freqData);
                 analyser.getFloatFrequencyData(floatFreqData);
                 
-                divData.style.width = freqData[8]+"px" || 0;
+                divData.style.width = ((freqData[8]/255) * 100) +"%" || 0;
+                LOG((freqData[8]/255));
             }, 50);
         </script>
     </body>
