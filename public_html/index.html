@@ -21,42 +21,72 @@ and open the template in the editor.
                 border-width: 1px;
                 min-width: 0px;
                 min-height: 20vh;
-                /*margin: auto;*/
                 text-align: center;
+            }
+            
+            #cDiv{
+                width:80%;
+                min-height: 80vh;
+                margin: auto;
             }
         </style>
     </head>
     <body>
         <div id="divAudio">
             <audio id="audioSrc" controls="" >
-                <source src="music/05 Delay Order.mp3">
+                <source src="music/comouflage.mp3">
             </audio>
         </div>
-        <div id="divData"></div>
+        <div id="cDiv"><canvas id="canvas"></canvas></div>
+
         <script>
             "use strict";
             function LOG(value){
                 console.log(value);
             }
-            var divData = document.getElementById("divData");
-            divData.style.backgroundColor = 'green';
             var audio = document.getElementById("audioSrc");
+            audio.volume = 0.1;
             var audioCtx = new AudioContext();
             var analyser = audioCtx.createAnalyser();
             var source = audioCtx.createMediaElementSource(audio);
             source.connect(analyser);
             analyser.connect(audioCtx.destination);
-            analyser.fftSize = 32;
+            analyser.fftSize = 2048;
             
             var freqData = new Uint8Array(analyser.frequencyBinCount);
             var floatFreqData = new Float32Array(analyser.frequencyBinCount);
-            setInterval(function(){
+            
+            var canvas = document.getElementById("canvas");
+            var ctx = canvas.getContext('2d');
+            var cWidth = document.getElementById('cDiv').clientWidth;
+            var cHeight = document.getElementById('cDiv').clientHeight;
+            canvas.width = cWidth;
+            canvas.height = cHeight;
+            var imgData;
+            var numRects = 1024;
+            var rectWidth = Math.ceil(cWidth/numRects);
+            
+            function pulse(timestamp){
+//                LOG('hi');
+                ctx.clearRect(0,0,cWidth, cHeight);
                 analyser.getByteFrequencyData(freqData);
                 analyser.getFloatFrequencyData(floatFreqData);
-                
-                divData.style.width = ((freqData[8]/255) * 100) +"%" || 0;
-                LOG((freqData[8]/255));
-            }, 50);
+                for(var i = 0; i < numRects; i++){
+                    ctx.fillStyle = 'rgb(0,'+(i*rectWidth)/255 +','+
+                           (cHeight * (freqData[i]/255)) / 255 +')';
+                    ctx.fillRect(i*rectWidth, 0, rectWidth, cHeight * 
+                            (freqData[i]/255) );
+//                    ctx.strokeRect(i*rectWidth, 0, rectWidth, cHeight *
+//                            (freqData[i]/255));
+                }
+                window.requestAnimationFrame(pulse);
+            }
+            
+            window.requestAnimationFrame(pulse);
+//            setInterval(function(){
+//                analyser.getByteFrequencyData(freqData);
+//                analyser.getFloatFrequencyData(floatFreqData);
+//            }, 50);
         </script>
     </body>
 </html>
