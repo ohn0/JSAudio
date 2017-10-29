@@ -27,10 +27,12 @@ and open the template in the editor.
                 text-align: center;
             }
             
-            #cDiv{
+            .canvas{
                 width:80%;
                 min-height: 400px;
                 margin: auto;
+                border-style: solid;
+                border-color: white;
             }
         </style>
     </head>
@@ -41,8 +43,9 @@ and open the template in the editor.
             </audio>
             <button type="button" onclick="toggleListen()">Listen</button>
         </div>
-        <div id="cDiv"><canvas id="canvas"></canvas></div>
-
+        <div id="cDiv"><canvas id="canvas" class="canvas"></canvas></div>
+        <div id="dDiv"><canvas id="canvasB" class="canvas"></canvas></div>
+        <script src="audioPlayer.js"></script>
         <script>
             "use strict";
             function LOG(value){
@@ -64,10 +67,14 @@ and open the template in the editor.
             
             var canvas = document.getElementById("canvas");
             var ctx = canvas.getContext('2d');
+            var canvasB = document.getElementById("canvasB");
+            var ctxB = canvasB.getContext('2d');
             var cWidth = document.getElementById('cDiv').clientWidth;
             var cHeight = document.getElementById('cDiv').clientHeight;
             canvas.width = cWidth;
             canvas.height = cHeight;
+            canvasB.width = cWidth;
+            canvasB.height = cHeight;
             var imgData;
             var numRects = analyser.fftSize/2;
             var rectWidth = Math.ceil(cWidth/numRects);
@@ -75,7 +82,6 @@ and open the template in the editor.
             var isPlaying = true;
             var requestVar;
             function pulse(timestamp){
-//                if(!isPlaying){ctx.clearRect(0,0,cWidth, cHeight);}
                 if(isPlaying){
                     ctx.clearRect(0,0,cWidth, cHeight);
                 }
@@ -84,15 +90,18 @@ and open the template in the editor.
                 for(var i = 0; i < numRects; i++){
                     ctx.fillStyle = 'rgb(0,'+((i*rectWidth)/divWidth) * 255 +','+
                            '128)';
-                    ctx.fillRect(i*rectWidth, 400 - cHeight * (freqData[i]/255), 
+                    ctx.fillRect(i*rectWidth, 800 - cHeight * (freqData[i]/255), 
                                        rectWidth, cHeight * (freqData[i]/255) );
-                    }
                 }
-//                requestVar = window.requestAnimationFrame(pulse);
-            
-            function drawBar(context,startX, startY, length)
-            {
-                return 0;
+                
+                ctxB.beginPath();
+                for(var i = 0; i < numRects; i++){
+                    ctxB.quadraticCurveTo(200, 200, cHeight * (freqData[i]/255),400);
+                }
+                ctxB.lineTo(cWidth,400);
+                ctxB.lineWidth = 2;
+                ctxB.strokeStyle = "white";
+                ctxB.stroke();
             }
             
             function stopVis(){
@@ -116,11 +125,6 @@ and open the template in the editor.
                 }
             }
             setInterval(function(){window.requestAnimationFrame(pulse);}, 30);
-//            window.requestAnimationFrame(pulse);
-//            setInterval(function(){
-//                analyser.getByteFrequencyData(freqData);
-//                analyser.getFloatFrequencyData(floatFreqData);
-//            }, 50);
         </script>
     </body>
 </html>
