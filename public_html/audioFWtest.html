@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>TODO supply a title</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+            
+            body{
+                background-color: black;
+            }
+            
+            #player{
+                height: 60%;
+                width: 80%;
+                margin: auto;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="player"></div>
+        <script src="audioPlayer.js"></script>
+        <script>
+            "use strict";
+            function LOG(val){console.log(val);}
+            var player = document.getElementById("player");
+            var aParam = {
+                context: player,
+                height: player.clientHeight,
+                width: player.clientWidth,
+                fileList: ['music/YSO_014.ogg', 
+                           'music/over^3 kill.mp3'],
+                visualize: true
+            };
+            
+            audioFW(aParam);
+            
+        </script>
+    </body>
+</html>
