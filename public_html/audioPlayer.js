@@ -12,6 +12,7 @@ function audioFW(params){
     aPlayer.cDiv.style.borderStyle = "solid";
     aPlayer.cDiv.style.borderColor = "white";
     aPlayer.requestVar = null;
+
     if(aPlayer.cDiv === null){
         alert("No div specified, quitting.");
         return null;
@@ -40,6 +41,7 @@ function audioFW(params){
         aPlayer.audioDIV.style.textAlign = "center";
         aPlayer.audioDIV.appendChild(aPlayer.audioEle);
         aPlayer.audioEle.controls = true;
+        aPlayer.audioEle.volume = 0.1;
         aPlayer.audioEle.onpause = aPlayer.stopVis;
         aPlayer.audioEle.onplay = aPlayer.startVis;
         aPlayer.audioEle.src = aPlayer.fileList[0];
@@ -74,15 +76,7 @@ function audioFW(params){
         return null;
     }
     
-    aPlayer.startVis = function(){
-        aPlayer.requestVar = window.requestAnimationFrame(aPlayer.barVisual);
-        aPlayer.isPlaying = true;
-    };
-    
-    aPlayer.stopVis = function(){
-        window.cancelAnimationFrame(aPlayer.requestVar);
-        aPlayer.isPlaying = false;
-    };
+
     
     aPlayer.barVisual = function(timestamp){
         if(aPlayer.isPlaying){ 
@@ -95,24 +89,60 @@ function audioFW(params){
                     ((i*aPlayer.animator.rectWidth)/aPlayer.cWidth) * 255 + ','+
                     '128)';
             aPlayer.animator.ctx.fillRect(i*aPlayer.animator.rectWidth,
-                    400-aPlayer.cHeight * (aPlayer.animator.freqData[i]/255),
+                    (400)-aPlayer.cHeight * (aPlayer.animator.freqData[i]/255),
                     aPlayer.animator.rectWidth, aPlayer.cHeight * 
                     (aPlayer.animator.freqData[i]/255));
         }
         return null;
     };
     
+    aPlayer.lineVisual = function(timestamp){
+        aPlayer.animator.ctx.clearRect(0,0, aPlayer.cWidth, aPlayer.cHeight);
+        aPlayer.CTX.analyser.getByteFrequencyData(aPlayer.animator.freqData);
+        aPlayer.CTX.analyser.getFloatFrequencyData(aPlayer.animator.floatFreqData);
+        aPlayer.animator.ctx.beginPath();
+        aPlayer.animator.ctx.moveTo(0, aPlayer.cHeight/2);
+        for(var i = 0; i < aPlayer.CTX.analyser.fftSize/2; i++){
+            aPlayer.animator.ctx.lineTo(i*aPlayer.animator.rectWidth,
+                           (aPlayer.cHeight/2) - ((aPlayer.cHeight/2) *
+                                   (aPlayer.animator.freqData[i]/255)));
+        }
+        aPlayer.animator.ctx.lineTo(aPlayer.cWidth, aPlayer.cHeight/2);
+        aPlayer.animator.ctx.lineWidth = 2;
+        aPlayer.animator.ctx.strokeStyle = "red";
+        aPlayer.animator.ctx.stroke();
+    };
+    
+    
+    aPlayer.startVis = function(){
+        aPlayer.requestVar = window.requestAnimationFrame(aPlayer.visualFn);
+        aPlayer.isPlaying = true;
+    };
+    
+    aPlayer.stopVis = function(){
+        window.cancelAnimationFrame(aPlayer.requestVar);
+        aPlayer.isPlaying = false;
+    };
+    
+    if(params.visualStyle === "bar"){
+        aPlayer.visualFn = aPlayer.barVisual;
+    }
+    else if(params.visualStyle === "line"){
+        aPlayer.visualFn = aPlayer.lineVisual;
+    }
+    
     createPlayer();
     createAudioContext();
     if(params.visualize){
         createVisualizer();
         setInterval(function(){
-            aPlayer.requestVar = window.requestAnimationFrame(aPlayer.barVisual);
+            aPlayer.requestVar = window.requestAnimationFrame(aPlayer.visualFn);
         },25);
     }
     document.body.onresize = function(){
         aPlayer.animator.rectWidth = Math.ceil(aPlayer.cDiv.clientWidth / 
                 (aPlayer.CTX.analyser.fftSize/2));
+        aPlayer.cWidth = aPlayer.cDiv.clientWidth;
     };
     LOG('done');
     return aPlayer;
