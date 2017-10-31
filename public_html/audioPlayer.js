@@ -119,16 +119,18 @@ function audioFW(params){
     };
     
     aPlayer.rippleVisual = function(timestamp){
-        rippleCounter++;
+        aPlayer.CTX.analyser.getByteFrequencyData(aPlayer.animator.freqData);
         rippleList[rippleCounter % rippleLimit] = ripples({
             x: Math.random() * aPlayer.cWidth,
-            y: Math.random() * aPlayer.cHeight
+            y: Math.random() * aPlayer.cHeight,
+            growthRate: 10 * (aPlayer.animator.freqData[Math.floor(Math.random() *
+                        (aPlayer.CTX.analyser.fftSize/2))] / 255)
         });
+        rippleCounter++;
         aPlayer.animator.ctx.strokeStyle = "white";
         aPlayer.animator.ctx.clearRect(0,0, aPlayer.cWidth, aPlayer.cHeight);
         for(var i = 0; i < Math.min(rippleCounter, rippleLimit); i++){
             aPlayer.animator.ctx.beginPath();
-//            LOG(rippleList[i]);
             aPlayer.animator.ctx.arc(rippleList[i].x, rippleList[i].y,
                                     rippleList[i].radius, 0, 2*Math.PI);
             rippleList[i].grow();
@@ -184,11 +186,12 @@ function ripples(params){
     var rippleList = {};
     rippleList.x = params.x;
     rippleList.y = params.y;
+    rippleList.growthRate = params.growthRate;
     rippleList.radius = 2;
-    
+    LOG(rippleList.growthRate);
     rippleList.grow = function(){
         if(rippleList.radius < 100){
-            rippleList.radius += 2;
+            rippleList.radius += rippleList.growthRate;
         }
     };
     
