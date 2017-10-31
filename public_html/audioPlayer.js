@@ -118,25 +118,46 @@ function audioFW(params){
         aPlayer.animator.ctx.stroke();
     };
     
-    aPlayer.rippleVisual = function(timestamp){
-        aPlayer.CTX.analyser.getByteFrequencyData(aPlayer.animator.freqData);
-        rippleList[rippleCounter % rippleLimit] = ripples({
-            x: Math.random() * aPlayer.cWidth,
-            y: Math.random() * aPlayer.cHeight,
-            growthRate: 10 * (aPlayer.animator.freqData[Math.floor(Math.random() *
-                        (aPlayer.CTX.analyser.fftSize/2))] / 255)
-        });
-        rippleCounter++;
-        aPlayer.animator.ctx.strokeStyle = "white";
+    aPlayer.circleVisual = function(timestamp){
         aPlayer.animator.ctx.clearRect(0,0, aPlayer.cWidth, aPlayer.cHeight);
-        for(var i = 0; i < Math.min(rippleCounter, rippleLimit); i++){
-            aPlayer.animator.ctx.beginPath();
-            aPlayer.animator.ctx.arc(rippleList[i].x, rippleList[i].y,
-                                    rippleList[i].radius, 0, 2*Math.PI);
-            rippleList[i].grow();
-            aPlayer.animator.ctx.stroke();
+        aPlayer.CTX.analyser.getByteFrequencyData(aPlayer.animator.freqData);
+        aPlayer.animator.ctx.beginPath();
+        aPlayer.animator.ctx.arc(aPlayer.cWidth/2, aPlayer.cHeight/2, 50, 
+                                 0, 2*Math.PI);
+        for(var i = 0; i < aPlayer.CTX.analyser.fftSize/2; i++){
+            
+        }
+        aPlayer.animator.ctx.strokeStyle = "red";
+        aPlayer.animator.ctx.lineWidth = 2;
+        aPlayer.animator.ctx.stroke();
+    };
+    
+    aPlayer.gridVisual = function(timestamp){
+        aPlayer.CTX.analyser.getByteFrequencyData(aPlayer.animator.freqData);
+        var rectWidth = aPlayer.cWidth / aPlayer.grid.length;
+        var rectHeight = aPlayer.cHeight / aPlayer.grid[0].length;
+//        aPlayer.animator.ctx.clearRect(0,0, aPlayer.cWidth, aPlayer.cHeight);
+        for(var i = 0; i < aPlayer.CTX.analyser.fftSize/2; i++){
+            var gridX = (i * (Math.floor(Math.random()*20))) % aPlayer.grid.length;
+            var gridY = aPlayer.animator.freqData[i] * Math.floor(Math.random() * 20)
+                        % aPlayer.grid[0].length;
+            changeColor('rgb(0,'+ aPlayer.animator.freqData[i]
+                     + ',128)');
+            grid[gridX][gridY].color = 'rgb(0,'+ aPlayer.animator.freqData[i]+ ',128)';
+            aPlayer.animator.ctx.fillRect(aPlayer.grid[gridX][gridY].x,
+                                          aPlayer.grid[gridX][gridY].y,
+                                          rectWidth, rectHeight);
+        }
+        
+        for(var i = 0; i < aPlayer.grid.length; i++){
+            for(var j = 0; j < aPlayer.grid[0].length; j++){
+                
+            }
         }
     };
+    
+    
+    
     
     function changeColor(colorVal){
         aPlayer.animator.ctx.fillStyle = colorVal;
@@ -156,11 +177,15 @@ function audioFW(params){
     if(params.visualStyle === "bar"){
         aPlayer.visualFn = aPlayer.barVisual;
     }
-    else if(params.visualStyle === "ripple"){
-        aPlayer.visualFn = aPlayer.rippleVisual;
+    else if(params.visualStyle === "circle"){
+        aPlayer.visualFn = aPlayer.circleVisual;
     }
     else if(params.visualStyle === "line"){
         aPlayer.visualFn = aPlayer.lineVisual;
+    }
+    else if(params.visualStyle === "grid"){
+        aPlayer.visualFn = aPlayer.gridVisual;
+        aPlayer.grid = makeGrid({x:aPlayer.cWidth, y:aPlayer.cHeight});
     }
     
     createPlayer();
@@ -188,12 +213,21 @@ function ripples(params){
     rippleList.y = params.y;
     rippleList.growthRate = params.growthRate;
     rippleList.radius = 2;
-    LOG(rippleList.growthRate);
     rippleList.grow = function(){
         if(rippleList.radius < 100){
             rippleList.radius += rippleList.growthRate;
         }
     };
-    
     return rippleList;
+}
+
+function makeGrid(params){
+    var grid = [];
+    for(var i = 0; i < params.x; i+=10){
+        grid.push([]);
+        for(var j = 0; j < params.y; j+=10){
+            grid[grid.length - 1].push({x:i,y:j});
+        }
+    }
+    return grid;
 }
