@@ -23,10 +23,12 @@ function audioFW(params){
     
     aPlayer.addMusicFile = function(musicFile){
         aPlayer.fileList.push(musicFile);
+        updateSongList();
         return null;
     };
     
     aPlayer.setBufferSize = function(bufferSize){
+        //MUST be a power of two.
         aCTX.analyser.fftSize = bufferSize;
         return null;
     };
@@ -39,12 +41,21 @@ function audioFW(params){
         aPlayer.audioDIV = document.createElement('div');
         aPlayer.audioDIV.nextButton = document.createElement('button');
         aPlayer.audioDIV.prevButton = document.createElement('button');
+        aPlayer.audioDIV.list = document.createElement('div');
+        aPlayer.audioDIV.style.width = "80%";
+        aPlayer.audioDIV.style.margin = "auto";
+        aPlayer.audioDIV.list.style.color = "white"; 
+        aPlayer.audioDIV.style.textAlign = "auto";
+//        aPlayer.audioDIV.style.display = "inline";
+//        aPlayer.audioDIV.list.style.textAlign = "center";
+//        aPlayer.audioDIV.list.style.margin = "auto";
+//        aPlayer.audioDIV.list.style.width = "80%";
+        aPlayer.audioDIV.nextButton.type = "button";
         aPlayer.audioDIV.nextButton.value = "next";
         aPlayer.audioDIV.nextButton.innerHTML = "next";
-        aPlayer.audioDIV.nextButton.type = "button";
+        aPlayer.audioDIV.prevButton.type = "button";
         aPlayer.audioDIV.prevButton.value = "previous";
         aPlayer.audioDIV.prevButton.innerHTML = "previous";
-        aPlayer.audioDIV.prevButton.type = "button";
         aPlayer.audioEle = document.createElement('audio');
         aPlayer.audioDIV.style.minWidth = "80%";
         aPlayer.audioDIV.style.margin = "auto";
@@ -52,6 +63,7 @@ function audioFW(params){
         aPlayer.audioDIV.appendChild(aPlayer.audioEle);
         aPlayer.audioDIV.appendChild(aPlayer.audioDIV.prevButton);
         aPlayer.audioDIV.appendChild(aPlayer.audioDIV.nextButton);
+        aPlayer.audioDIV.appendChild(aPlayer.audioDIV.list);
         setButtonFn();
         aPlayer.audioEle.controls = true;
         aPlayer.audioEle.id = params.fwID;
@@ -59,24 +71,42 @@ function audioFW(params){
         aPlayer.audioEle.onplay = aPlayer.startVis;
         aPlayer.currentlyPlaying = 0;
         aPlayer.audioEle.src = aPlayer.fileList[aPlayer.currentlyPlaying];
+        updateSongList();
+        aPlayer.audioDIV.list.innerHTML = aPlayer.fileString;
         aPlayer.cDiv.appendChild(aPlayer.audioDIV);
         return null;
     }
     
+    function updateSongList(){
+        aPlayer.fileString = "";
+        for(var i = 0; i < aPlayer.fileList.length; i++){
+            if(i === aPlayer.currentlyPlaying){
+                aPlayer.fileString += "(currently playing)";
+            }
+            aPlayer.fileString += (aPlayer.fileList[i])+"<br/>";
+        }
+        LOG(aPlayer.fileString);
+    }
+    
     function setButtonFn(){
-        aPlayer.audioDIV.nextButton.onclick = function(){
+        aPlayer.audioDIV.nextButton.onclick = function(){    
             aPlayer.currentlyPlaying++;
             if(aPlayer.currentlyPlaying === aPlayer.fileList.length){
                 aPlayer.currentlyPlaying = 0;
             }
+            updateSongList();
             aPlayer.audioEle.src = aPlayer.fileList[aPlayer.currentlyPlaying];
+            aPlayer.audioDIV.list.innerHTML = aPlayer.fileString;
+        
         };
         aPlayer.audioDIV.prevButton.onclick = function(){
             aPlayer.currentlyPlaying--;
             if(aPlayer.currentlyPlaying === -1){
                 aPlayer.currentlyPlaying = aPlayer.fileList.length-1;
             }
+            updateSongList();
             aPlayer.audioEle.src = aPlayer.fileList[(aPlayer.currentlyPlaying)];
+            aPlayer.audioDIV.list.innerHTML = aPlayer.fileString;
 
         };
     }
@@ -129,7 +159,6 @@ function audioFW(params){
         aPlayer.animator.ctx.clearRect(0,0, aPlayer.cWidth, aPlayer.cHeight);
         aPlayer.CTX.analyser.getByteFrequencyData(aPlayer.animator.freqData);
         aPlayer.CTX.analyser.getFloatFrequencyData(aPlayer.animator.floatFreqData);
-//        LOG(aPlayer.animator.floatFreqData[0]);
         aPlayer.animator.ctx.beginPath();
         aPlayer.animator.ctx.moveTo(0, aPlayer.cHeight/2);
         for(var i = 0; i < aPlayer.CTX.analyser.fftSize/2; i++){
@@ -175,6 +204,10 @@ function audioFW(params){
             0, 1, (-1*aPlayer.animator.freqData[i]/255) * lineLength);
             aPlayer.animator.ctx.rotate(0);
         }
+    };
+    
+    aPlayer.setVolume = function(nVolume){
+        aPlayer.audioEle.volume = nVolume;
     };
     
     function changeColor(colorVal){
