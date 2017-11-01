@@ -27,6 +27,7 @@ function audioFW(params){
         return null;
     };
     
+    
     aPlayer.setBufferSize = function(bufferSize){
         //MUST be a power of two.
         aCTX.analyser.fftSize = bufferSize;
@@ -42,7 +43,7 @@ function audioFW(params){
         aPlayer.audioDIV.nextButton = document.createElement('button');
         aPlayer.audioDIV.prevButton = document.createElement('button');
         aPlayer.audioDIV.list = document.createElement('div');
-        aPlayer.audioDIV.style.width = "80%";
+//        aPlayer.audioDIV.style.width = "80%";
         aPlayer.audioDIV.style.margin = "auto";
         aPlayer.audioDIV.list.style.color = "white"; 
         aPlayer.audioDIV.style.textAlign = "auto";
@@ -53,7 +54,7 @@ function audioFW(params){
         aPlayer.audioDIV.prevButton.value = "previous";
         aPlayer.audioDIV.prevButton.innerHTML = "previous";
         aPlayer.audioEle = document.createElement('audio');
-        aPlayer.audioDIV.style.minWidth = "80%";
+//        aPlayer.audioDIV.style.minWidth = "80%";
         aPlayer.audioDIV.style.margin = "auto";
         aPlayer.audioDIV.style.textAlign = "center";
         aPlayer.audioDIV.appendChild(aPlayer.audioEle);
@@ -150,6 +151,7 @@ function audioFW(params){
         }
         return null;
     };
+    
     
     aPlayer.lineVisual = function(timestamp){
         aPlayer.animator.ctx.clearRect(0,0, aPlayer.cWidth, aPlayer.cHeight);
@@ -248,6 +250,7 @@ function audioFW(params){
                 (aPlayer.CTX.analyser.fftSize/2));
         aPlayer.animator.canvasEle.width = aPlayer.cDiv.clientWidth;
         aPlayer.cWidth = aPlayer.cDiv.clientWidth;
+        aPlayer.cHeight = aPlayer.cDiv.clientHeight;
     };
     LOG('Done');
     return aPlayer;
