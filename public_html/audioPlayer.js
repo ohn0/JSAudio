@@ -21,7 +21,7 @@ function audioFW(params){
         return null;
     }
     
-    aPlayer.addMusicFile = function(musicFile){
+    aPlayer.addFile = function(musicFile){
         aPlayer.fileList.push(musicFile);
         updateSongList();
         return null;
@@ -46,10 +46,6 @@ function audioFW(params){
         aPlayer.audioDIV.style.margin = "auto";
         aPlayer.audioDIV.list.style.color = "white"; 
         aPlayer.audioDIV.style.textAlign = "auto";
-//        aPlayer.audioDIV.style.display = "inline";
-//        aPlayer.audioDIV.list.style.textAlign = "center";
-//        aPlayer.audioDIV.list.style.margin = "auto";
-//        aPlayer.audioDIV.list.style.width = "80%";
         aPlayer.audioDIV.nextButton.type = "button";
         aPlayer.audioDIV.nextButton.value = "next";
         aPlayer.audioDIV.nextButton.innerHTML = "next";
@@ -225,16 +221,19 @@ function audioFW(params){
         aPlayer.isPlaying = false;
     };
     
-    if(params.visualStyle === "bar"){
-        aPlayer.visualFn = aPlayer.barVisual;
-    }
-    else if(params.visualStyle === "circle"){
-        aPlayer.visualFn = aPlayer.circleVisual;
-    }
-    else if(params.visualStyle === "line"){
-        aPlayer.visualFn = aPlayer.lineVisual;
-    }
+    aPlayer.changeVisual = function(nVisual){
+        if(nVisual === "bar"){
+            aPlayer.visualFn = aPlayer.barVisual;
+        }
+        else if(nVisual === "circle"){
+            aPlayer.visualFn = aPlayer.circleVisual;
+        }
+        else if(nVisual === "line"){
+            aPlayer.visualFn = aPlayer.lineVisual;
+        }
+    };
 
+    aPlayer.changeVisual(params.visualStyle);
     createPlayer();
     createAudioContext();
     if(params.visualize){
