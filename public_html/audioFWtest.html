@@ -35,13 +35,16 @@ and open the template in the editor.
                 width: player.clientWidth,
                 fileList: ['music/YSO_014.ogg',
                            'music/02. The Party of SevenWitches.mp3',
-                           'music/Halozy - sunshine from rainy.mp3',
-                           'music/over^3 kill.mp3',
-                           'music/05 Paradox.mp3',
-                           'music/09 Externity (XIO Remix).mp3'],
+                           'music/over^3 kill.mp3'],
                 visualize: true,
-                visualStyle: "circle",
-                fwID: "idA"
+                visualStyle: "circle",  
+                fwID: "idA",
+                colorFn: function(params){
+                    var color = "rgb("+
+                            ((params.time)/params.duration)* 255+
+                            ",128,0)";
+                    return color;
+                }
             };
             
             audioFW(aParam);
