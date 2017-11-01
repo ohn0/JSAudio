@@ -43,11 +43,11 @@ function audioFW(params){
         aPlayer.audioDIV.style.textAlign = "center";
         aPlayer.audioDIV.appendChild(aPlayer.audioEle);
         aPlayer.audioEle.controls = true;
-        aPlayer.audioEle.volume = 0.1;
+//        aPlayer.audioEle.volume = 0.1;
         aPlayer.audioEle.id = params.fwID;
         aPlayer.audioEle.onpause = aPlayer.stopVis;
         aPlayer.audioEle.onplay = aPlayer.startVis;
-        aPlayer.audioEle.src = aPlayer.fileList[1];
+        aPlayer.audioEle.src = aPlayer.fileList[5];
         aPlayer.cDiv.appendChild(aPlayer.audioDIV);
         return null;
     }
@@ -119,17 +119,30 @@ function audioFW(params){
     };
     
     aPlayer.circleVisual = function(timestamp){
+        aPlayer.animator.ctx.setTransform(1,0,0,1,0,0);
         aPlayer.animator.ctx.clearRect(0,0, aPlayer.cWidth, aPlayer.cHeight);
         aPlayer.CTX.analyser.getByteFrequencyData(aPlayer.animator.freqData);
         aPlayer.animator.ctx.beginPath();
         aPlayer.animator.ctx.arc(aPlayer.cWidth/2, aPlayer.cHeight/2, 50, 
                                  0, 2*Math.PI);
-        for(var i = 0; i < aPlayer.CTX.analyser.fftSize/2; i++){
-            
-        }
+        var radianSlice = (2*Math.PI)/aPlayer.animator.freqData.length;
         aPlayer.animator.ctx.strokeStyle = "red";
         aPlayer.animator.ctx.lineWidth = 2;
         aPlayer.animator.ctx.stroke();
+        aPlayer.animator.ctx.fillStyle = "red";
+        for(var i = 0; i < aPlayer.CTX.analyser.fftSize/2; i++){
+            var location = radianSlice * i;
+            var startX = 50 * (Math.cos(location));
+            var startY = 50 * (Math.sin(location));
+            aPlayer.animator.ctx.setTransform(1, 0, 0, 1, startX+(aPlayer.cWidth/2),
+            (aPlayer.cHeight/2)-startY);
+            aPlayer.animator.ctx.rotate((location - (Math.PI/2))/-1);
+            aPlayer.animator.ctx.fillRect(0,
+            0, 1, -1*aPlayer.animator.freqData[i]);
+//            aPlayer.animator.ctx.fillRect((startX + (aPlayer.cWidth/2))/-2,
+//            ((aPlayer.cHeight/2)-startY)/-2, 1, aPlayer.animator.freqData[i]);
+            aPlayer.animator.ctx.rotate(0);
+        }
     };
     
     aPlayer.gridVisual = function(timestamp){
