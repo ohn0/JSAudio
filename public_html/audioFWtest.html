@@ -15,7 +15,7 @@ and open the template in the editor.
                 background-color: black;
             }
             
-            #player{
+            .audio{
                 height: 60%;
                 width: 80%;
                 margin: auto;
@@ -23,12 +23,14 @@ and open the template in the editor.
         </style>
     </head>
     <body>
-        <div id="player"></div>
+        <div id="player" class="audio"></div><br/>
+        <div id="playerB" class="audio"></div>
         <script src="audioPlayer.js"></script>
         <script>
             "use strict";
             function LOG(val){console.log(val);}
             var player = document.getElementById("player");
+            var playerB = document.getElementById("playerB");
             var aParam = {
                 context: player,
                 height: player.clientHeight,
@@ -40,11 +42,26 @@ and open the template in the editor.
                            'music/05 Paradox.mp3',
                            'music/09 Externity (XIO Remix).mp3'],
                 visualize: true,
-                visualStyle: "circle",
+                visualStyle: "line",
+                fwID: "idA"
+            };
+            var BParam = {
+                context: playerB,
+                height: playerB.clientHeight,
+                width: playerB.clientWidth,
+                fileList: ['music/YSO_014.ogg',
+                           'music/02. The Party of SevenWitches.mp3',
+                           'music/Halozy - sunshine from rainy.mp3',
+                           'music/over^3 kill.mp3',
+                           'music/05 Paradox.mp3',
+                           'music/09 Externity (XIO Remix).mp3'],
+                visualize: true,
+                visualStyle: "line",
                 fwID: "idA"
             };
             
             audioFW(aParam);
+            audioFW(BParam);
             
         </script>
     </body>

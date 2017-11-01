@@ -47,7 +47,7 @@ function audioFW(params){
         aPlayer.audioEle.id = params.fwID;
         aPlayer.audioEle.onpause = aPlayer.stopVis;
         aPlayer.audioEle.onplay = aPlayer.startVis;
-        aPlayer.audioEle.src = aPlayer.fileList[5];
+        aPlayer.audioEle.src = aPlayer.fileList[4];
         aPlayer.cDiv.appendChild(aPlayer.audioDIV);
         return null;
     }
