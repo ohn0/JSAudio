@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>Audio Player</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src='audioPlayer.js'></script>
+    </head>
+    <body>
+        <div>Do you need an audio player with visualizations because
+        your site is too boring that it needs to use other media to
+        get some visitors? Well then this framework is just what you needed!
+        <br/><br/>
+        If you want a simple music player(no visuals), then all you need to do
+        is call audioFW() with a parameter object with a 'cDiv' parameter and a
+        'fileList' parameter. Specify the div that the framework will work in and
+        an array of filenames of music files you want played.
+        </div>
+        <div id='audioA'></div>
+        
+        
+        <script>
+            function my$(val){return document.getElementById(val);}
+            var audioA = audioFW({context: my$('audioA'),
+                                 fileList:['music/YSO_014.ogg']});
+        </script>
+    </body>
+</html>

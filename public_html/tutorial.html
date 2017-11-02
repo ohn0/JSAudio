@@ -6,23 +6,33 @@ and open the template in the editor.
 -->
 <html>
     <head>
-        <title>TODO supply a title</title>
+        <title>Audio player tutorial</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <style>
             .heading{
-                color: aquamarine;
+                color: #00BBFF;
                 text-align:center;
             }
             
             .info{
                 display: flex;
+                border-style: solid;
+            }
+            
+            #overview{
+                text-align: center;
+                width: 50%;
+                margin: auto;
             }
             
             .audioText{
                 padding: 10px;
                 width: 50%;
-                text-align:center;
+            }
+            
+            .contents{
+                text-align: center;
             }
             
             .audioEle{
@@ -59,9 +69,11 @@ and open the template in the editor.
             element can play are mp3, ogg, and wav. The codepen example won't let
             you play any of the files, though. Below is a working player with one file.
             <br/><br/>
+            <div class='contents'>
             <audio controls='' src='music/YSO_014.ogg'></audio></div>
+            </div>
             <div class="audioEle"><p data-height="265" data-theme-id="0" data-slug-hash="rYxNyg" data-default-tab="html" data-user="VVWV" data-embed-version="2" data-pen-title="rYxNyg" class="codepen">See the Pen <a href="https://codepen.io/VVWV/pen/rYxNyg/">rYxNyg</a> by ayyy (<a href="https://codepen.io/VVWV">@VVWV</a>) on <a href="https://codepen.io">CodePen</a>.</p>
-<script async src="https://production-assets.codepen.io/assets/embed/ei.js"></script></div>
+            <script async src="https://production-assets.codepen.io/assets/embed/ei.js"></script></div>
         </div>
         <br/>
         <h2 class="heading">Audio API</h2>
@@ -74,7 +86,9 @@ and open the template in the editor.
                 generated, allowing the developer to route the data to intermediate nodes
                 which can transform the audio data to add effects and modifications
                 before the user can hear the sound.<br/><br/>
+                <div class='contents'>
                 <img alt src="https://mdn.mozillademos.org/files/12237/webaudioAPI_en.svg">
+                </div>
                 <br/> This picture shows how the audio API works on audio data.
                 <ol>
                     <li>We first create an audio context object within which the
@@ -98,13 +112,9 @@ and open the template in the editor.
                 let me use music files, so the working player is below. Note how
                 if we don't connect the source to the destination, the audio
                 file will play but you won't hear anything.<br/>
+                <div class='contents'> 
                 <audio id='step2' controls='' src='music/YSO_014.ogg'></audio>
-                <script>
-                    var aEle = document.getElementById('step2');
-                    var ctx = new AudioContext();
-                    var aSrc = ctx.createMediaElementSource(aEle);
-                    aSrc.connect(ctx.destination);
-                </script>
+                </div>
             </div>
             <div  class="audioEle"><p data-height="265" data-theme-id="0" data-slug-hash="rYxVgQ" data-default-tab="js,result" data-user="VVWV" data-embed-version="2" data-pen-title="rYxVgQ" class="codepen">See the Pen <a href="https://codepen.io/VVWV/pen/rYxVgQ/">rYxVgQ</a> by ayyy (<a href="https://codepen.io/VVWV">@VVWV</a>) on <a href="https://codepen.io">CodePen</a>.</p>
             <script async src="https://production-assets.codepen.io/assets/embed/ei.js"></script></div>
@@ -122,9 +132,10 @@ and open the template in the editor.
                 acquire. The higher this value, the more data we will have to work
                 with, but this will also mean more work for the processor. 
                 The number of samples also has to be a power of two. The
-                default value for the tutorial is set to 512. Also, the actual
-                vaues we will have to work with will be half the size of the
-                number of samples, so the default number is 256.<br/>
+                default value for the tutorial is set to 512. However, the number
+                of samples we will have to work with is NOT 512, it will be a half
+                of the number of samples set, so we actually have 256 values to
+                work with. Keep that in mind when you make your own later. <br/>
                 The analyser node doesn't modify audio data, however it does 
                 create a buffer that is filled with the sampled data as long as
                 the song is playing. We can now access this buffer and extract
@@ -134,7 +145,7 @@ and open the template in the editor.
                 Now whenever the audio file will be playing, the output will be
                 first sent to the analyser node, and then forwarded to the 
                 destination. We also create a Uint8Array, outputData, sending the
-                size of size of analyser's bins to it. I am using a Uint8Array
+                size of analyser's bins to it. I am using a Uint8Array
                 because this constrains all the sampled values between 0 and 255.
                 which could be used to do something with RGB values.A function, updateVals, is
                 created, which has the analyser node calling getByteFrequencyData.
@@ -146,40 +157,20 @@ and open the template in the editor.
                 sample values of the file.<br/>
                 Play the audio player below and watch as all the values in the buffer 
                 keep changing, these are the values the file is generating.<br/>
-                <audio id='step3' controls='' src='music/YSO_014.ogg'></audio>
-                <div id='audioData'></div>
-                <script>
-                    var aEle = document.getElementById('step3');
-                    var ctx = new AudioContext();
-                    var aSrc = ctx.createMediaElementSource(aEle);
-                    var analyser = ctx.createAnalyser();
-                    aSrc.connect(analyser);
-                    analyser.connect(ctx.destination);
-                    analyser.fftSize = 64;
-                    var outputData = new Uint8Array(analyser.frequencyBinCount);
-                    var outputDIV = document.getElementById('audioData');
-                    function updateVals(){
-                        analyser.getByteFrequencyData(outputData);
-                        var values = "";
-                        for(var i = 0; i < outputData.length/2; i+=2){
-                            values += (i+": " + outputData[i] +", " + (i+1) +": " + 
-                                    outputData[i+1] + "<br/>");
-                        }
-                        outputDIV.innerHTML = values;                        
-                    }
-                    setInterval(updateVals, 50);
-                </script>
+                <div class='contents'><audio id='step3' controls='' src='music/YSO_014.ogg'></audio>
+                    <div id='audioData'></div>
+                </div>
             </div>
             <div class='audioEle'><p data-height="265" data-theme-id="0" data-slug-hash="zPrKed" data-default-tab="js" data-user="VVWV" data-embed-version="2" data-pen-title="audio2" class="codepen">See the Pen <a href="https://codepen.io/VVWV/pen/zPrKed/">audio2</a> by ayyy (<a href="https://codepen.io/VVWV">@VVWV</a>) on <a href="https://codepen.io">CodePen</a>.</p>
-<script async src="https://production-assets.codepen.io/assets/embed/ei.js"></script></div>
+            <script async src="https://production-assets.codepen.io/assets/embed/ei.js"></script></div>
         </div>
         <h2 class='heading'>Using the data with the canvas</h2>
         <div class='info'>
             <div class='audioText'>
                 We are almost done, all we have to do now is associate the buffer
                 with all the sampled values with some kind of visual. We'll do 
-                a simple one, generating bars that whose sizes change based on
-                the value of the array.
+                a simple one, generating bars whose sizes change based on
+                the values of the array.
                 We first have to set up the canvas.<br/>
                 Check the snippet's HTML tab to see how to create a canvas element.
                 Once we have the element, check the JS tab to see the script we are using.
@@ -194,27 +185,37 @@ and open the template in the editor.
                 and height. 
                 Once we escape the loop we call requestAnimationFrame, which is like
                 setInterval, but is more efficient for canvas objects, as it doesn't
-                update the screen if we aren't focused on the window.
-                <canvas id='canvasA' width='400' height='400'> </canvas>
-                <script>
-                    var canvasEle = document.getElementById('canvasA');
-                    var cCtx = canvasEle.getContext('2d');
-                    function visual(){
-                    cCtx.clearRect(0,0, canvasEle.width, canvasEle.height);
-                    var rectWidth = canvasEle.width / outputData.length;
-                    canvasEle.fillStyle = "blue";
-                    for(var i = 0; i < outputData.length; i++){
-                        cCtx.fillRect(i* rectWidth,canvasEle.height - 
-                                ((outputData[i]/255) * canvasEle.height), rectWidth,
-                                ((outputData[i]/255) * canvasEle.height));
-                        }
-                        requestAnimationFrame(visual);
-                    }
-                    requestAnimationFrame(visual);
-                </script>
+                update the screen if we aren't focused on the window. Try to 
+                understand how the fillRect method is drawing each rect, I think 
+                it will help you if you want to make your own visualizations.
+                Use the audio player from the top to see the visualizations.<br/>
+                <div class='contents'>
+                <canvas id='canvasA' width='400' height='400'></canvas>
+                </div>
             </div>
             <div class='audioEle'><p data-height="265" data-theme-id="0" data-slug-hash="JOGWry" data-default-tab="js" data-user="VVWV" data-embed-version="2" data-pen-title="audio4" class="codepen">See the Pen <a href="https://codepen.io/VVWV/pen/JOGWry/">audio4</a> by ayyy (<a href="https://codepen.io/VVWV">@VVWV</a>) on <a href="https://codepen.io">CodePen</a>.</p>
 <script async src="https://production-assets.codepen.io/assets/embed/ei.js"></script></div>
         </div>
+        <script src='tutorialScripts.js'></script>
+        <h2 class='heading'>Summary</h2>
+        <div id='summary'>If you've made it this far, that probably means you 
+        tried the examples and attempted to build your own visualizer. I hope
+        that went well for you. My experience with it was pretty rough when I began
+        working on the visualizer. Creating the element was pretty easy, the 
+        tough part was figuring out how to use the audio context to get the 
+        sampling data from the music file. I spent a good 4 hours looking over 
+        20 lines of javascript trying to figure out why the data wasn't being
+        transferred properly. After consulting the documentation multiple times and
+        just trying any combination I could think of, the audio context finally
+        decided to work properly. The funny part is I still don't know what I fixed 
+        to read the data into my buffer. But I got it to work at the end and after that all I had
+        to do was link the data into the canvas element. That was a pretty interesting
+        part as I had to figure out just how I would draw each bar into the canvas
+        to show the visual, it was confusing at first because I forgot that the
+        Y-axis starts at 0 on the top left and increases as you go DOWN the screen.
+        Once I got that mistake taken care of, the rest of the visualizations were
+        just messing with some math and drawing it into the screen, not so bad.
+        </div>
+        
     </body>
 </html>

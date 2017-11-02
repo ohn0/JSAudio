@@ -1,5 +1,7 @@
 "use strict";
 
+function LOG(val){console.log(val);}
+
 function audioFW(params){
     var aPlayer = {};
     var aCTX = {};
