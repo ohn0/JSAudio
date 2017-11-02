@@ -11,10 +11,14 @@ function audioFW(params){
     aPlayer.isPlaying = true;
     aPlayer.cDiv.style.borderStyle = "solid";
     aPlayer.cDiv.style.borderColor = "white";
+    aPlayer.colorFn = params.colorFn || function(params){
+        var color = "rgb("+
+        ((params.time)/params.duration)* 255+
+        ",128,0)";
+         return color;
+    };
+    aPlayer.mainID = params.contextID;
     aPlayer.requestVar = null;
-    var rippleList = [];
-    var rippleCounter = 0;
-    var rippleLimit = 100;
 
     if(aPlayer.cDiv === null){
         alert("No div specified, quitting.");
@@ -28,22 +32,18 @@ function audioFW(params){
     };
     
     
-    aPlayer.setBufferSize = function(bufferSize){
-        //MUST be a power of two.
+    aPlayer.setQuality = function(bufferSize){
+        //bufferSize MUST be a power of two.
         aCTX.analyser.fftSize = bufferSize;
         return null;
     };
     
-    aPlayer.pulse = function(){
-        return null;
-    };
     
     function createPlayer(){
         aPlayer.audioDIV = document.createElement('div');
         aPlayer.audioDIV.nextButton = document.createElement('button');
         aPlayer.audioDIV.prevButton = document.createElement('button');
         aPlayer.audioDIV.list = document.createElement('div');
-//        aPlayer.audioDIV.style.width = "80%";
         aPlayer.audioDIV.style.margin = "auto";
         aPlayer.audioDIV.list.style.color = "white"; 
         aPlayer.audioDIV.style.textAlign = "auto";
@@ -54,11 +54,10 @@ function audioFW(params){
         aPlayer.audioDIV.prevButton.value = "previous";
         aPlayer.audioDIV.prevButton.innerHTML = "previous";
         aPlayer.audioEle = document.createElement('audio');
-//        aPlayer.audioDIV.style.minWidth = "80%";
         aPlayer.audioDIV.style.margin = "auto";
         aPlayer.audioDIV.style.textAlign = "center";
-        aPlayer.audioDIV.appendChild(aPlayer.audioEle);
         aPlayer.audioDIV.appendChild(aPlayer.audioDIV.prevButton);
+        aPlayer.audioDIV.appendChild(aPlayer.audioEle);
         aPlayer.audioDIV.appendChild(aPlayer.audioDIV.nextButton);
         aPlayer.audioDIV.appendChild(aPlayer.audioDIV.list);
         setButtonFn();
@@ -82,6 +81,7 @@ function audioFW(params){
             }
             aPlayer.fileString += (aPlayer.fileList[i])+"<br/>";
         }
+        aPlayer.audioDIV.list.innerHTML = aPlayer.fileString;
         LOG(aPlayer.fileString);
     }
     
@@ -160,8 +160,9 @@ function audioFW(params){
         aPlayer.animator.ctx.beginPath();
         aPlayer.animator.ctx.moveTo(0, aPlayer.cHeight/2);
         for(var i = 0; i < aPlayer.CTX.analyser.fftSize/2; i++){
-            changeColor('rgb(0,'+((i*aPlayer.animator.rectWidth)/aPlayer.cWidth)
-                    *255 + ',128)');
+            aPlayer.animator.ctx.fillStyle = aPlayer.colorFn({
+            time:(document.getElementById(aPlayer.audioEle.id).currentTime),
+            duration:document.getElementById(aPlayer.audioEle.id).duration});
             aPlayer.animator.ctx.lineTo(i*aPlayer.animator.rectWidth,
                            (aPlayer.cHeight/2) - ((aPlayer.cHeight/2) *
                                    (aPlayer.animator.freqData[i]/255)));
@@ -187,7 +188,7 @@ function audioFW(params){
             duration:document.getElementById(aPlayer.audioEle.id).duration});
         aPlayer.animator.ctx.lineWidth = 2;
         aPlayer.animator.ctx.stroke();
-        aPlayer.animator.ctx.fillStyle = params.colorFn({
+        aPlayer.animator.ctx.fillStyle = aPlayer.colorFn({
             time:(document.getElementById(aPlayer.audioEle.id).currentTime),
             duration:document.getElementById(aPlayer.audioEle.id).duration});
         var lineLength = aPlayer.cWidth/2;
@@ -214,12 +215,17 @@ function audioFW(params){
     }
     
     aPlayer.startVis = function(){
-        aPlayer.requestVar = window.requestAnimationFrame(aPlayer.visualFn);
+        if(aPlayer.visual){
+            aPlayer.requestVar = window.requestAnimationFrame(aPlayer.visualFn);
+        }
         aPlayer.isPlaying = true;
     };
     
     aPlayer.stopVis = function(){
-        window.cancelAnimationFrame(aPlayer.requestVar);
+        if(aPlayer.visual){
+            window.cancelAnimationFrame(aPlayer.requestVar);
+ 
+        }
         aPlayer.isPlaying = false;
     };
     
@@ -228,55 +234,39 @@ function audioFW(params){
             aPlayer.visualFn = aPlayer.barVisual;
         }
         else if(nVisual === "circle"){
+            aPlayer.cHeight = aPlayer.cWidth;
+            aPlayer.animator.canvasEle.height = aPlayer.cHeight;
             aPlayer.visualFn = aPlayer.circleVisual;
         }
         else if(nVisual === "line"){
             aPlayer.visualFn = aPlayer.lineVisual;
         }
+        else{
+            alert("Invalid visual type entered, setting to 'bar'.");
+            aPlayer.visualFn = aPlayer.barVisual;
+        }
     };
-
-    aPlayer.changeVisual(params.visualStyle);
+    
     createPlayer();
     createAudioContext();
     if(params.visualize){
+        aPlayer.visual = true;
         createVisualizer();
+        aPlayer.changeVisual(params.visualStyle);
+
         setInterval(function(){
             aPlayer.requestVar = window.requestAnimationFrame(aPlayer.visualFn);
         },25);
+        window.addEventListener("resize", function(){
+            aPlayer.animator.rectWidth = Math.ceil(aPlayer.cDiv.clientWidth / 
+                    (aPlayer.CTX.analyser.fftSize/2));
+            aPlayer.animator.canvasEle.width = aPlayer.cDiv.clientWidth;
+            aPlayer.cWidth = aPlayer.cDiv.clientWidth;
+        });
     }
     
-    document.body.onresize = function(){
-        aPlayer.animator.rectWidth = Math.ceil(aPlayer.cDiv.clientWidth / 
-                (aPlayer.CTX.analyser.fftSize/2));
-        aPlayer.animator.canvasEle.width = aPlayer.cDiv.clientWidth;
-        aPlayer.cWidth = aPlayer.cDiv.clientWidth;
-        aPlayer.cHeight = aPlayer.cDiv.clientHeight;
-    };
     LOG('Done');
     return aPlayer;
 }
 
-function ripples(params){
-    var rippleList = {};
-    rippleList.x = params.x;
-    rippleList.y = params.y;
-    rippleList.growthRate = params.growthRate;
-    rippleList.radius = 2;
-    rippleList.grow = function(){
-        if(rippleList.radius < 100){
-            rippleList.radius += rippleList.growthRate;
-        }
-    };
-    return rippleList;
-}
 
-function makeGrid(params){
-    var grid = [];
-    for(var i = 0; i < params.x; i+=10){
-        grid.push([]);
-        for(var j = 0; j < params.y; j+=10){
-            grid[grid.length - 1].push({x:i,y:j});
-        }
-    }
-    return grid;
-}

@@ -10,6 +10,16 @@ and open the template in the editor.
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <style>
+            #heading{
+                color:white;
+                text-align: center;
+            }
+            
+            #overview{
+                color:white;
+                text-align: center;
+            }
+            
             body{
                 background-color: black;
             }
@@ -20,13 +30,24 @@ and open the template in the editor.
                 margin: auto;  
             }
             
+            #playerC{
+                height: 20%;
+                width: 20%;
+            }
 
         </style>
     </head>
     <body>
+        <h1 id="heading">Tutorial Test page</h1>
+        <p id="overview">This is my tutorial's test page, below are some audio players, each
+           ready to display the visualizations created. Hit the play button
+           to see the visualization in action, you can also choose to play the
+           next song or go to the previous one. The last audio player does not
+           have a visualization, it just plays music.</p>
         <div id="playerA" class="player"></div><br/>
         <div id="playerB" class="player"></div><br/>
         <div id="playerC" class="player"></div><br/>
+        <div id="playerD" class="player"></div><br/>
         <script src="audioPlayer.js"></script>
         <script>
             "use strict";
@@ -41,6 +62,7 @@ and open the template in the editor.
             var playerA = my$("playerA");
             var playerB = my$("playerB");
             var playerC = my$("playerC");
+            var playerD = my$("playerD");
             
             var audioA = {
                 context: playerA,
@@ -52,6 +74,7 @@ and open the template in the editor.
                 visualize: true,
                 visualStyle: "bar",  
                 fwID: "idA",
+                contextID: "playerA",
                 colorFn: function(params){
                     var color = "rgb("+
                             ((params.time)/params.duration)* 255+
@@ -59,6 +82,7 @@ and open the template in the editor.
                     return color;
                 }
             };
+            
             
             var audioB = {
                 context: playerB,
@@ -70,6 +94,7 @@ and open the template in the editor.
                 visualize: true,
                 visualStyle: "line",  
                 fwID: "idB",
+                contextID: "playerB",
                 colorFn: function(params){
                     var color = "rgb("+
                             ((params.time)/params.duration)* 255+
@@ -88,18 +113,26 @@ and open the template in the editor.
                 visualize: true,
                 visualStyle: "circle",  
                 fwID: "idC",
+                contextID: "playerC",
                 colorFn: function(params){
-                    var color = "rgb("+
-                            ((params.time)/params.duration)* 255+
-                            ",128,0)";
-                    return color;
+                    return "red";
                 }
             };
             
-            var apA = audioFW(audioA);
+            var audioD = {
+                context: playerD,
+                fileList: [
+                    'music/YSO_014.ogg'
+                ]
+            };
+            
             var apB = audioFW(audioB);
             var apC = audioFW(audioC);
-            
+            var apA = audioFW(audioA);
+            var apD = audioFW(audioD);
+//
+            apA.addFile("music/02 - Par1ty Panzer.mp3");
+            apC.addFile("music/14. Collapse.mp3");
             
         </script>
     </body>
