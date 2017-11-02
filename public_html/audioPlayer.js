@@ -120,7 +120,7 @@ function audioFW(params){
     }
     
     function createVisualizer(){
-        if(params.visualize === null || params.visualize === false){
+        if(params.visualize === null || params.visualialze === false){
             return null;
         }
         aAnimator.canvasEle = document.createElement('canvas');

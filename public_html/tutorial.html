@@ -20,12 +20,18 @@ and open the template in the editor.
             }
             
             .audioText{
+                padding: 10px;
                 width: 50%;
                 text-align:center;
             }
             
-            #audioEle{
+            .audioEle{
+                margin: auto;
                 flex-grow: 1;
+            }
+            
+            #canvasA{
+                border-style: solid;
             }
         </style>
     </head>
@@ -54,10 +60,10 @@ and open the template in the editor.
             you play any of the files, though. Below is a working player with one file.
             <br/><br/>
             <audio controls='' src='music/YSO_014.ogg'></audio></div>
-            <div id="audioEle"><p data-height="265" data-theme-id="0" data-slug-hash="rYxNyg" data-default-tab="html" data-user="VVWV" data-embed-version="2" data-pen-title="rYxNyg" class="codepen">See the Pen <a href="https://codepen.io/VVWV/pen/rYxNyg/">rYxNyg</a> by ayyy (<a href="https://codepen.io/VVWV">@VVWV</a>) on <a href="https://codepen.io">CodePen</a>.</p>
+            <div class="audioEle"><p data-height="265" data-theme-id="0" data-slug-hash="rYxNyg" data-default-tab="html" data-user="VVWV" data-embed-version="2" data-pen-title="rYxNyg" class="codepen">See the Pen <a href="https://codepen.io/VVWV/pen/rYxNyg/">rYxNyg</a> by ayyy (<a href="https://codepen.io/VVWV">@VVWV</a>) on <a href="https://codepen.io">CodePen</a>.</p>
 <script async src="https://production-assets.codepen.io/assets/embed/ei.js"></script></div>
         </div>
-        
+        <br/>
         <h2 class="heading">Audio API</h2>
         <div class="info">
             <div class="audioText">
@@ -67,7 +73,7 @@ and open the template in the editor.
                 developer complete control over any audio content being played or
                 generated, allowing the developer to route the data to intermediate nodes
                 which can transform the audio data to add effects and modifications
-                before the user can hear the sound.<br/>
+                before the user can hear the sound.<br/><br/>
                 <img alt src="https://mdn.mozillademos.org/files/12237/webaudioAPI_en.svg">
                 <br/> This picture shows how the audio API works on audio data.
                 <ol>
@@ -89,17 +95,126 @@ and open the template in the editor.
                 The codepen to the right shows you how to create a basic audio context.
                 Note that we just create a source and link it to a destination, we 
                 are not processing the data in any way. Once again, codepen won't 
-                let me use music files, so the working player is below.
+                let me use music files, so the working player is below. Note how
+                if we don't connect the source to the destination, the audio
+                file will play but you won't hear anything.<br/>
                 <audio id='step2' controls='' src='music/YSO_014.ogg'></audio>
                 <script>
                     var aEle = document.getElementById('step2');
                     var ctx = new AudioContext();
-                    var src = ctx.createMediaElementSource(aEle);
-                    src.connect(aEle.destination);
+                    var aSrc = ctx.createMediaElementSource(aEle);
+                    aSrc.connect(ctx.destination);
                 </script>
-                <div></div>
             </div>
+            <div  class="audioEle"><p data-height="265" data-theme-id="0" data-slug-hash="rYxVgQ" data-default-tab="js,result" data-user="VVWV" data-embed-version="2" data-pen-title="rYxVgQ" class="codepen">See the Pen <a href="https://codepen.io/VVWV/pen/rYxVgQ/">rYxVgQ</a> by ayyy (<a href="https://codepen.io/VVWV">@VVWV</a>) on <a href="https://codepen.io">CodePen</a>.</p>
+            <script async src="https://production-assets.codepen.io/assets/embed/ei.js"></script></div>
         </div>
-
+        <br/>
+        <h2 class='heading'>Extracting Data</h2>
+        <div class='info'>
+            <div class='audioText'>
+                Now that you have some idea of how the audio API functions, we can
+                add an intermediate node after the input node to read the data 
+                the music file is currently generating.<br/>
+                The audio file is being sampled at any given time and we can extract
+                this data and put it into a buffer with the help of the audio API.
+                We first need to set the size of the number of samples we want to 
+                acquire. The higher this value, the more data we will have to work
+                with, but this will also mean more work for the processor. 
+                The number of samples also has to be a power of two. The
+                default value for the tutorial is set to 512. Also, the actual
+                vaues we will have to work with will be half the size of the
+                number of samples, so the default number is 256.<br/>
+                The analyser node doesn't modify audio data, however it does 
+                create a buffer that is filled with the sampled data as long as
+                the song is playing. We can now access this buffer and extract
+                the sampling data of the song while it is playing.<br/><br/>
+                The snippet to the right shows how we create an intermediate node
+                (analyser) and use it as a bridge between the input and output.
+                Now whenever the audio file will be playing, the output will be
+                first sent to the analyser node, and then forwarded to the 
+                destination. We also create a Uint8Array, outputData, sending the
+                size of size of analyser's bins to it. I am using a Uint8Array
+                because this constrains all the sampled values between 0 and 255.
+                which could be used to do something with RGB values.A function, updateVals, is
+                created, which has the analyser node calling getByteFrequencyData.
+                This function copies the current values of the analyser's 
+                buffer into the buffer we provide(outputData). We then write
+                those values to the screen. Finally we call setInterval and pass
+                it updateVals with an interval of 50ms. Every 50ms, updateVals
+                will be called, which will fill ouput data with the current
+                sample values of the file.<br/>
+                Play the audio player below and watch as all the values in the buffer 
+                keep changing, these are the values the file is generating.<br/>
+                <audio id='step3' controls='' src='music/YSO_014.ogg'></audio>
+                <div id='audioData'></div>
+                <script>
+                    var aEle = document.getElementById('step3');
+                    var ctx = new AudioContext();
+                    var aSrc = ctx.createMediaElementSource(aEle);
+                    var analyser = ctx.createAnalyser();
+                    aSrc.connect(analyser);
+                    analyser.connect(ctx.destination);
+                    analyser.fftSize = 64;
+                    var outputData = new Uint8Array(analyser.frequencyBinCount);
+                    var outputDIV = document.getElementById('audioData');
+                    function updateVals(){
+                        analyser.getByteFrequencyData(outputData);
+                        var values = "";
+                        for(var i = 0; i < outputData.length/2; i+=2){
+                            values += (i+": " + outputData[i] +", " + (i+1) +": " + 
+                                    outputData[i+1] + "<br/>");
+                        }
+                        outputDIV.innerHTML = values;                        
+                    }
+                    setInterval(updateVals, 50);
+                </script>
+            </div>
+            <div class='audioEle'><p data-height="265" data-theme-id="0" data-slug-hash="zPrKed" data-default-tab="js" data-user="VVWV" data-embed-version="2" data-pen-title="audio2" class="codepen">See the Pen <a href="https://codepen.io/VVWV/pen/zPrKed/">audio2</a> by ayyy (<a href="https://codepen.io/VVWV">@VVWV</a>) on <a href="https://codepen.io">CodePen</a>.</p>
+<script async src="https://production-assets.codepen.io/assets/embed/ei.js"></script></div>
+        </div>
+        <h2 class='heading'>Using the data with the canvas</h2>
+        <div class='info'>
+            <div class='audioText'>
+                We are almost done, all we have to do now is associate the buffer
+                with all the sampled values with some kind of visual. We'll do 
+                a simple one, generating bars that whose sizes change based on
+                the value of the array.
+                We first have to set up the canvas.<br/>
+                Check the snippet's HTML tab to see how to create a canvas element.
+                Once we have the element, check the JS tab to see the script we are using.
+                We get the canvas element and get a context object(cCtx). We then
+                have a function, visual, which will be drawing the bars in the canvas.
+                The first thing we do is we clear the canvas(clearRect), we then 
+                define rectWidth as the length of a single bar, which will be the
+                total width of the canvas divided by the number of bars we will be
+                drawing. We then enter a loop where we constantly call fillRect, which
+                draws a rectangle at the location specified by the first two parameters,
+                and uses the last 2 parameters as the dimension of the rectangle, width
+                and height. 
+                Once we escape the loop we call requestAnimationFrame, which is like
+                setInterval, but is more efficient for canvas objects, as it doesn't
+                update the screen if we aren't focused on the window.
+                <canvas id='canvasA' width='400' height='400'> </canvas>
+                <script>
+                    var canvasEle = document.getElementById('canvasA');
+                    var cCtx = canvasEle.getContext('2d');
+                    function visual(){
+                    cCtx.clearRect(0,0, canvasEle.width, canvasEle.height);
+                    var rectWidth = canvasEle.width / outputData.length;
+                    canvasEle.fillStyle = "blue";
+                    for(var i = 0; i < outputData.length; i++){
+                        cCtx.fillRect(i* rectWidth,canvasEle.height - 
+                                ((outputData[i]/255) * canvasEle.height), rectWidth,
+                                ((outputData[i]/255) * canvasEle.height));
+                        }
+                        requestAnimationFrame(visual);
+                    }
+                    requestAnimationFrame(visual);
+                </script>
+            </div>
+            <div class='audioEle'><p data-height="265" data-theme-id="0" data-slug-hash="JOGWry" data-default-tab="js" data-user="VVWV" data-embed-version="2" data-pen-title="audio4" class="codepen">See the Pen <a href="https://codepen.io/VVWV/pen/JOGWry/">audio4</a> by ayyy (<a href="https://codepen.io/VVWV">@VVWV</a>) on <a href="https://codepen.io">CodePen</a>.</p>
+<script async src="https://production-assets.codepen.io/assets/embed/ei.js"></script></div>
+        </div>
     </body>
 </html>
