@@ -10,14 +10,27 @@ and open the template in the editor.
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <style>
-            h1{
+            .heading{
                 color: aquamarine;
                 text-align:center;
+            }
+            
+            .info{
+                display: flex;
+            }
+            
+            .audioText{
+                width: 50%;
+                text-align:center;
+            }
+            
+            #audioEle{
+                flex-grow: 1;
             }
         </style>
     </head>
     <body>
-        <h1>Audio Player Tutorial</h1>
+        <h1 class="heading">Audio Player Tutorial</h1>
         <div id="overview">
         This is an audio player framework that lets the user insert music files
         and play them on their site. At the minimum, the user needs to supply a 
@@ -27,14 +40,66 @@ and open the template in the editor.
         I wanted to build an audio player and I managed to do that using the audio
         API provided. I also wanted to create some visualizations to go along with
         the music being played and was able to create three types of visuals: a bar,
-        line, and circle visual, creative names, right?<br/>
+        line, and circle visual. Creative names, right?<br/>
         This tutorial will allow the reader to get familiar with the audio API and
         learn how to extract data from the audio file and use it in canvas.
         </div>
         
-        <h2>Audio API</h2>
-        <div id="audioINFO">
-            
+        <h2 class="heading">Audio element</h2>
+        <div class="info">
+            <div class="audioText">If you want to play audio, you are going to need
+            a basic audio player. Conveniently, we can create a basic player using
+            the audio element as shown to the right. The only kinds of files the
+            element can play are mp3, ogg, and wav. The codepen example won't let
+            you play any of the files, though. Below is a working player with one file.
+            <br/><br/>
+            <audio controls='' src='music/YSO_014.ogg'></audio></div>
+            <div id="audioEle"><p data-height="265" data-theme-id="0" data-slug-hash="rYxNyg" data-default-tab="html" data-user="VVWV" data-embed-version="2" data-pen-title="rYxNyg" class="codepen">See the Pen <a href="https://codepen.io/VVWV/pen/rYxNyg/">rYxNyg</a> by ayyy (<a href="https://codepen.io/VVWV">@VVWV</a>) on <a href="https://codepen.io">CodePen</a>.</p>
+<script async src="https://production-assets.codepen.io/assets/embed/ei.js"></script></div>
         </div>
+        
+        <h2 class="heading">Audio API</h2>
+        <div class="info">
+            <div class="audioText">
+                The audio element is pretty simple, but to build a visualizer, we
+                need a way to access the data that the audio element is generating.
+                This requires the usage of the audio API. The audio API gives the
+                developer complete control over any audio content being played or
+                generated, allowing the developer to route the data to intermediate nodes
+                which can transform the audio data to add effects and modifications
+                before the user can hear the sound.<br/>
+                <img alt src="https://mdn.mozillademos.org/files/12237/webaudioAPI_en.svg">
+                <br/> This picture shows how the audio API works on audio data.
+                <ol>
+                    <li>We first create an audio context object within which the
+                        audio API will function.
+                    <li>An input node is then defined, this can be an audio element 
+                        playing a file, an audio source on the web, a microphone 
+                        the user talks into, basically anything that generates noise.
+                        This node outputs data converted from an audio signal which
+                        can be used to modify the sound.
+                    <li>The source output is then routed into 0 or more effects
+                        nodes, these are functions that the user creates, or  
+                        the API provides. These nodes take the input and transform
+                        it in someway, like modifying the intensity, adding reverb,
+                        or compressing the data.
+                    <li>The last node is the destination node, this is where the 
+                        sound will be played, like your speakers or headphones.
+                </ol>
+                The codepen to the right shows you how to create a basic audio context.
+                Note that we just create a source and link it to a destination, we 
+                are not processing the data in any way. Once again, codepen won't 
+                let me use music files, so the working player is below.
+                <audio id='step2' controls='' src='music/YSO_014.ogg'></audio>
+                <script>
+                    var aEle = document.getElementById('step2');
+                    var ctx = new AudioContext();
+                    var src = ctx.createMediaElementSource(aEle);
+                    src.connect(aEle.destination);
+                </script>
+                <div></div>
+            </div>
+        </div>
+
     </body>
 </html>
