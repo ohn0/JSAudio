@@ -16,8 +16,8 @@ and open the template in the editor.
             }
             
             .audio{
-                height: 60%;
-                width: 80%;
+                height: 80%;
+                width: 60%;
                 margin: auto;
             }
         </style>
@@ -51,9 +51,11 @@ and open the template in the editor.
                            'music/Halozy - sunshine from rainy.mp3',
                            'music/over^3 kill.mp3',
                            'music/05 Paradox.mp3',
-                           'music/09 Externity (XIO Remix).mp3'],
+                           'music/09 Externity (XIO Remix).mp3',
+                           'music/Cosmic flower.mp3'],
                 visualize: true,
-                visualStyle: "line",
+                colorFn: function(params){return "rgb("+params.time%255+",128,255)";},
+                visualStyle: "circle",
                 fwID: "idA"
             };
             

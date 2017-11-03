@@ -1,0 +1,34 @@
+
+.heading{
+    color: #00BBFF;
+    text-align:center;
+}
+
+.info{
+    display: flex;
+    border-style: solid;
+}
+
+#overview{
+    text-align: center;
+    width: 50%;
+    margin: auto;
+}
+
+.audioText{
+    padding: 10px;
+    width: 50%;
+}
+
+.contents{
+    text-align: center;
+}
+
+.audioEle{
+    margin: auto;
+    flex-grow: 1;
+}
+
+#canvasA{
+    border-style: solid;
+}

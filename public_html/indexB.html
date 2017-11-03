@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>TODO supply a title</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+            body{
+                background-color: black;
+            }
+            #divAudio{
+                min-width: 80%;
+                margin: auto;
+                text-align: center;
+            }
+
+            #divData{
+                border-style: solid;
+                border-width: 1px;
+                min-width: 0px;
+                min-height: 20vh;
+                text-align: center;
+            }
+            
+            .canvas{
+                width:80%;
+                min-height: 400px;
+                margin: auto;
+                border-style: solid;
+                border-color: white;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="divAudio">
+            <audio id="audioSrc" controls="" onpause="stopVis()" onplay="startVis()">
+                <source src="music/03. Over^3 Kill (1043 Progressive Mix).mp3">
+            </audio>
+            <button type="button" onclick="toggleListen()">Listen</button>
+        </div>
+        <div id="cDiv"><canvas id="canvas" class="canvas"></canvas></div>
+        <div id="dDiv"><canvas id="canvasB" class="canvas"></canvas></div>
+        <script src="audioPlayer.js"></script>
+        <script>
+            "use strict";
+            function LOG(value){
+                console.log(value);
+            }
+            var divWidth = document.getElementById("cDiv").clientWidth;
+            var audio = document.getElementById("audioSrc");
+//            audio.volume = 0.1;
+            var audioCtx = new AudioContext();
+            var analyser = audioCtx.createAnalyser();
+            var source = audioCtx.createMediaElementSource(audio);
+            source.connect(analyser);
+            var connected = false;
+//            analyser.connect(audioCtx.destination);
+            analyser.fftSize = 2048;
+            
+            var freqData = new Uint8Array(analyser.frequencyBinCount);
+            var floatFreqData = new Float32Array(analyser.frequencyBinCount);
+            
+            var canvas = document.getElementById("canvas");
+            var ctx = canvas.getContext('2d');
+            var canvasB = document.getElementById("canvasB");
+            var ctxB = canvasB.getContext('2d');
+            var cWidth = document.getElementById('cDiv').clientWidth;
+            var cHeight = document.getElementById('cDiv').clientHeight;
+            canvas.width = cWidth;
+            canvas.height = cHeight;
+            canvasB.width = cWidth;
+            canvasB.height = cHeight;
+            var imgData;
+            var numRects = analyser.fftSize/2;
+            var rectWidth = Math.ceil(cWidth/numRects);
+            var timer = 0;
+            var isPlaying = true;
+            var requestVar;
+            function pulse(timestamp){
+                if(isPlaying){
+                    ctx.clearRect(0,0,cWidth, cHeight);
+                }
+                analyser.getByteFrequencyData(freqData);
+                analyser.getFloatFrequencyData(floatFreqData);
+                for(var i = 0; i < numRects; i++){
+                    ctx.fillStyle = 'rgb(0,'+((i*rectWidth)/divWidth) * 255 +','+
+                           '128)';
+                    ctx.fillRect(i*rectWidth, 800 - cHeight * (freqData[i]/255), 
+                                       rectWidth, cHeight * (freqData[i]/255) );
+                }
+                
+                ctxB.beginPath();
+                for(var i = 0; i < numRects; i++){
+                    ctxB.quadraticCurveTo(200, 200, cHeight * (freqData[i]/255),400);
+                }
+                ctxB.lineTo(cWidth,400);
+                ctxB.lineWidth = 2;
+                ctxB.strokeStyle = "white";
+                ctxB.stroke();
+            }
+            
+            function stopVis(){
+                window.cancelAnimationFrame(requestVar);
+                isPlaying = false;
+            }
+            
+            function startVis(){
+                isPlaying = true;
+                requestVar = window.requestAnimationFrame(pulse);
+            }
+            
+            function toggleListen(){
+                if(connected){
+                    analyser.disconnect(audioCtx.destination);
+                    connected = false;
+                }
+                else{
+                    analyser.connect(audioCtx.destination);
+                    connected = true;
+                }
+            }
+            setInterval(function(){window.requestAnimationFrame(pulse);}, 30);
+        </script>
+    </body>
+</html>

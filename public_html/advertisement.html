@@ -9,25 +9,144 @@ and open the template in the editor.
         <title>Audio Player</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel='stylesheet' type='text/css' href='tutorialCSS.css'>
         <script src='audioPlayer.js'></script>
     </head>
     <body>
-        <div>Do you need an audio player with visualizations because
-        your site is too boring that it needs to use other media to
-        get some visitors? Well then this framework is just what you needed!
-        <br/><br/>
-        If you want a simple music player(no visuals), then all you need to do
-        is call audioFW() with a parameter object with a 'cDiv' parameter and a
-        'fileList' parameter. Specify the div that the framework will work in and
-        an array of filenames of music files you want played.
+        <h1 class="heading">Audio visualizer framework</h1>
+        <div class="info">
+            <div class="audioText">
+                Do you need an audio player with visualizations because
+                your site is too boring that it needs to use other media to
+                get some visitors? Well then this framework is just what you needed!
+                <br/><br/>
+                If you want a simple music player(no visuals), then all you need to do
+                is call audioFW() with a parameter object with a 'cDiv' parameter and a
+                'fileList' parameter. Specify the div that the framework will work in and
+                an array of filenames of music files you want played.
+                <div id='audioA'></div>
+            </div>
+            <div class="audioEle"><p data-height="265" data-theme-id="0" data-slug-hash="qVbVgN" data-default-tab="js" data-user="VVWV" data-embed-version="2" data-pen-title="qVbVgN" class="codepen">See the Pen <a href="https://codepen.io/VVWV/pen/qVbVgN/">qVbVgN</a> by ayyy (<a href="https://codepen.io/VVWV">@VVWV</a>) on <a href="https://codepen.io">CodePen</a>.</p>
+                <script async src="https://production-assets.codepen.io/assets/embed/ei.js"></script></div>
         </div>
-        <div id='audioA'></div>
-        
-        
+        <br/><br/>
+        <div class="info">
+            <div class="audioText">
+                If you want something a bit more exotic, you can add a visualization
+                to the music being played. You can choose from three different
+                kinds of visuals:
+                <ul>
+                    <li>A 'bar' visual which displays a bunch of
+                        bars that change height based on the music.</li>
+                    <li>A 'line' visual which displays a line that changes based
+                        on the music.</li>
+                    <li>A 'circle' visual which shows a circle in the center which
+                        has lines growing off of it with the length of the line 
+                        dependent on the music.
+                </ul>
+                To the right you can see how to instantiate each of the three visuals.
+                You also need to specify 'visualize' to true in the parameter object.
+                Also note how we specify a colorFn which will let the user set the
+                color of the visual as time goes on. If you define a color function,
+                the params object for it will have a 'time' variable, and a 'duration'
+                variable which you can use to change the color. You can see players
+                in action in the tutorialTest linked at the bottom.
+            </div>
+            <div class='audioEle'><p data-height="265" data-theme-id="0" data-slug-hash="eeJyRJ" data-default-tab="js" data-user="VVWV" data-embed-version="2" data-pen-title="eeJyRJ" class="codepen">See the Pen <a href="https://codepen.io/VVWV/pen/eeJyRJ/">eeJyRJ</a> by ayyy (<a href="https://codepen.io/VVWV">@VVWV</a>) on <a href="https://codepen.io">CodePen</a>.</p>
+                <script async src="https://production-assets.codepen.io/assets/embed/ei.js"></script></div>
+        </div>
+        <br/><br/>
+        <div class='info'>
+            <div class='audioText'>
+                So you might be wondering what cool things the visualizer you just
+                made can do, and that is what this section will tell you.
+                You can skip to the next or previous song with the next and previous
+                buttons.<br/>
+                There is also a list that will show you all the songs in the file list
+                and which one is currently playing. You can choose to hide or show this list
+                with <i>closeList</i> and <i>showList</i>.<br/>
+                If your player is running too slow, you can call <i>setQuality</i>
+                with an integer value that is A POWER OF TWO, don't forget or bad 
+                things will happen, okay? <br/>
+                You can add more music with the <i>addFile</i> method, passing the
+                string path of a filename.<br/>
+                Get bored of the same visual all the time? Call <i>changeVisual</i>
+                with either "line", "bar", or "circle" as the argument to change the
+                visual to the new value. <br/>
+                Neighbors telling you to keep it down? Want to make them even
+                madder? call <i>setVolume</i> to decrease or increase the volume, only
+                accepts values between 0 and 100.<br/>
+                The way the visuals get color is also a function that you can set. The
+                function you define needs to take a parameter object that has a 'time'
+                and 'duration' field.<br/>
+                
+                Well that's all I got, You should add your own song files and check 
+                the visuals out instead of dealing with my horrible taste in music. 
+                You might like the visuals generated. The div to the right has
+                everything generated, have fun. Click the buttons below to change
+                the visuals! The circle visual is excluded because it modifies the
+                entire div. References used: <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API">
+                    mozilla audio API
+                </a> and <a href="https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API">
+                    mozilla canvas API
+                </a>
+                <br/>
+                <input type="button" value="Bar" id="bar" />
+                <input type="button" value="Line" id="line"/>
+                <br/>
+                <a href="tutorialTest.html">link</a> to the test page.
+            </div>
+            <div id='audioB'></div>
+        </div>
+        <div id='audioC'></div>
         <script>
-            function my$(val){return document.getElementById(val);}
+            function my$(val) {
+                return document.getElementById(val);
+            }
+            var musicFiles = ['music/YSO_014.ogg',
+                'music/02. The Party of SevenWitches.mp3',
+                'music/Halozy - sunshine from rainy.mp3',
+                'music/Over^3 Kill (1043 Progressive Mix).mp3',
+                'music/05 Paradox.mp3',
+                'music/09 Externity (XIO Remix).mp3',
+                'music/Cosmic flower.mp3'];
             var audioA = audioFW({context: my$('audioA'),
-                                 fileList:['music/YSO_014.ogg']});
+                fileList: ['music/YSO_014.ogg']});
+
+            var audioB = audioFW({context: my$('audioB'),
+                fileList: musicFiles,
+                visualize: true,
+                colorFn: function () {
+                    return "aquamarine";
+                },
+                visualStyle: "line",
+                height: 300,
+                width: 800
+            });
+            
+            audioB.closeList();
+            
+            my$("bar").onclick = function(){
+                audioB.changeVisual("bar");
+            };
+            
+            my$("line").onclick = function(){
+                audioB.changeVisual("line");
+            };
+            
+            var audioC = audioFW({context: my$('audioC'),
+                fileList: musicFiles,
+                visualize: true,
+                colorFn: function (params) {
+                    var color = "rgb("+
+                    ((params.time)/params.duration)* 255+
+                    ",128,255)";
+                     return color;
+                },
+                visualStyle: "circle"
+            });
+            
+
         </script>
     </body>
 </html>
